@@ -50,6 +50,9 @@ for d in range(2, 11, 2):
     trainingdataXt = trainingdataX.transpose()
 
     #this line calculates weight vector w from the equation (([Xt]*[X])^-1)*[Xt]*[Y]
+    #                            if x is an mxn matrix ->     (nxm)(m*n) * (n*m)(m*1)
+    #                                                         (n * n)(n * 1)
+    #                                                         (n * 1)
     w = np.matmul(np.matmul(inv(np.matmul(trainingdataXt, trainingdataX)), trainingdataXt),trainingdataY)
 
     #this transforms the nd array back into a list for easier manipulation

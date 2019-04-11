@@ -3,10 +3,12 @@ import math
 import numpy as np
 
 #this initializes the variables to empty lists
+
 rawtrainingdata = []
 trainingdata = []
 trainingdataY = []
-
+trainingaccuracy = []
+testingaccuracy = []
 #this reads in the data from the training csv file and trainsforms it into a 2 dimensional matrix where
 #each row is one set of data
 with open("usps-4-9-train.csv") as csvfile:
@@ -35,7 +37,8 @@ gradientw = [0]*256
 # then the gradient is updated
 # and after each iteration of the training data, w is updated by the gradient
 # it is updated by muliplying the gradient by a lamda value that is the learning rate
-for count in range(100):
+#still need to change the gradient as a command line argument
+for count in range(20):
     for x,y in zip(trainingdata, trainingdataY):
         dotwx = np.dot(w, x)
         predictY = 1/(1 + math.e**(-dotwx))
@@ -45,30 +48,58 @@ for count in range(100):
     neww = [w[i] - .0000001*gradientw[i] for i in range(len(w))]
     w = neww
 
-#this prints out the weight vector associated with each feature
-#print(w)
+    correct = 0.0
+    total = 0.0
+    for x,y in zip (trainingdata, trainingdataY):
+        mysum = 0
+        for i,j in zip(w, x):
+            mysum += i*j
+        # print("Predicted: " + str(mysum) + " Actual: " + str(y))
+        if mysum < 0 and y == 0:
+            correct += 1
+            total += 1
+        elif mysum > 0 and y == 1:
+            correct += 1
+            total += 1
+        else:
+            total += 1
+    trainingaccuracy =  trainingaccuracy + [correct/total]
 
-#this creates and initalizes the variables to empty lists for the testing data
-rawtestingdata = []
-testingdata = []
-testingdataY = []
+    #this creates and initalizes the variables to empty lists for the testing data
+    rawtestingdata = []
+    testingdata = []
+    testingdataY = []
 
-#this reads the testing csv file data and adds it to raw testing data list
-with open("usps-4-9-test.csv") as csvfile:
-    reader = csv.reader(csvfile, quoting=csv.QUOTE_NONNUMERIC)
-    for row in reader:
-        rawtestingdata.append(row)
+    #this reads the testing csv file data and adds it to raw testing data list
+    with open("usps-4-9-test.csv") as csvfile:
+        reader = csv.reader(csvfile, quoting=csv.QUOTE_NONNUMERIC)
+        for row in reader:
+            rawtestingdata.append(row)
 
-#this creates the features matrix for the testing data and the correlating expected Y value
-for x in rawtestingdata:
-    testingdataY.append(x.pop())
-    testingdata.append(x)
+    #this creates the features matrix for the testing data and the correlating expected Y value
+    for x in rawtestingdata:
+        testingdataY.append(x.pop())
+        testingdata.append(x)
 
-#this calculates the value that will determine which class the feature set should belong too
-#if the value mysum is < 0 it should be a 4
-#or if the value mysum is > 0 it should be a 9
-for x,y in zip (testingdata, testingdataY):
-    mysum = 0
-    for i,j in zip(w, x):
-        mysum += i*j
-    print("Predicted: " + str(mysum) + " Actual: " + str(y))
+    #this calculates the value that will determine which class the feature set should belong too
+    #if the value mysum is < 0 it should be a 4
+    #or if the value mysum is > 0 it should be a 9
+    correct = 0.0
+    total = 0.0
+    for x,y in zip (testingdata, testingdataY):
+        mysum = 0
+        for i,j in zip(w, x):
+            mysum += i*j
+        # print("Predicted: " + str(mysum) + " Actual: " + str(y))
+        if mysum < 0 and y == 0:
+            correct += 1
+            total += 1
+        elif mysum > 0 and y == 1:
+            correct += 1
+            total += 1
+        else:
+            total += 1
+    testingaccuracy =  testingaccuracy + [correct/total]
+
+print(trainingaccuracy)
+print(testingaccuracy)
