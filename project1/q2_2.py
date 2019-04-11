@@ -1,6 +1,7 @@
 import csv
 import math
 import numpy as np
+import matplotlib.pyplot as plt
 
 #this initializes the variables to empty lists
 
@@ -9,6 +10,7 @@ trainingdata = []
 trainingdataY = []
 trainingaccuracy = []
 testingaccuracy = []
+iterations = []
 #this reads in the data from the training csv file and trainsforms it into a 2 dimensional matrix where
 #each row is one set of data
 with open("usps-4-9-train.csv") as csvfile:
@@ -38,14 +40,14 @@ gradientw = [0]*256
 # and after each iteration of the training data, w is updated by the gradient
 # it is updated by muliplying the gradient by a lamda value that is the learning rate
 #still need to change the gradient as a command line argument
-for count in range(20):
+for count in range(50):
     for x,y in zip(trainingdata, trainingdataY):
         dotwx = np.dot(w, x)
         predictY = 1/(1 + math.e**(-dotwx))
         changeX = [i * (predictY - y) for i in x]
         newgradientw = [gradientw[i] + changeX[i] for i in range(len(x))]
         gradientw = newgradientw
-    neww = [w[i] - .0000001*gradientw[i] for i in range(len(w))]
+    neww = [w[i] - .00000001*gradientw[i] for i in range(len(w))]
     w = neww
 
     correct = 0.0
@@ -100,6 +102,15 @@ for count in range(20):
         else:
             total += 1
     testingaccuracy =  testingaccuracy + [correct/total]
+    iterations = iterations + [count+1]
 
 print(trainingaccuracy)
 print(testingaccuracy)
+
+plt.plot(iterations, trainingaccuracy, 'ro', label="Training Accuracy")
+plt.plot(iterations, testingaccuracy, 'b^', label="Testing Accuracy")
+plt.axis([0, 50, 0, 1])
+plt.xlabel("Number of Gradient Iterations")
+plt.ylabel("Accuracy Percentage")
+plt.legend(loc='lower right')
+plt.show()
