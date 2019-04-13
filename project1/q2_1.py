@@ -1,9 +1,17 @@
 import csv
 import math
 import numpy as np
+import argparse
 import matplotlib.pyplot as plt
 
 #this initializes the variables to empty lists
+parser = argparse.ArgumentParser()
+parser.add_argument('trainingdatafile')
+parser.add_argument('testingdatafile')
+parser.add_argument('lambdas')
+args = parser.parse_args()
+
+lambdas = float(args.lambdas)
 
 rawtrainingdata = []
 trainingdata = []
@@ -13,7 +21,7 @@ testingaccuracy = []
 iterations = []
 #this reads in the data from the training csv file and trainsforms it into a 2 dimensional matrix where
 #each row is one set of data
-with open("usps-4-9-train.csv") as csvfile:
+with open(args.trainingdatafile) as csvfile:
     reader = csv.reader(csvfile, quoting=csv.QUOTE_NONNUMERIC)
     for row in reader:
         rawtrainingdata.append(row)
@@ -27,8 +35,7 @@ for x in rawtrainingdata:
 #this creates the w to be all 0's and is the size of all the features plus the dummy feature
 w = [0]*256
 
-#this creates the gradient and sets all values to 0 and is the exact same size as w
-gradientw = [0]*256
+
 
 #this iterates through algorithm in order to train w
 #it does this by calculating 1/(1+ e^(-w o x))
@@ -40,14 +47,16 @@ gradientw = [0]*256
 # and after each iteration of the training data, w is updated by the gradient
 # it is updated by muliplying the gradient by a lamda value that is the learning rate
 #still need to change the gradient as a command line argument
-for count in range(50):
+for count in range(100):
+    #this creates the gradient and sets all values to 0 and is the exact same size as w
+    gradientw = [0]*256
     for x,y in zip(trainingdata, trainingdataY):
         dotwx = np.dot(w, x)
         predictY = 1/(1 + math.e**(-dotwx))
         changeX = [i * (predictY - y) for i in x]
         newgradientw = [gradientw[i] + changeX[i] for i in range(len(x))]
         gradientw = newgradientw
-    neww = [w[i] - .00000001*gradientw[i] for i in range(len(w))]
+    neww = [w[i] - lambdas*gradientw[i] for i in range(len(w))]
     w = neww
 
     correct = 0.0
@@ -73,7 +82,7 @@ for count in range(50):
     testingdataY = []
 
     #this reads the testing csv file data and adds it to raw testing data list
-    with open("usps-4-9-test.csv") as csvfile:
+    with open(args.testingdatafile) as csvfile:
         reader = csv.reader(csvfile, quoting=csv.QUOTE_NONNUMERIC)
         for row in reader:
             rawtestingdata.append(row)
@@ -107,10 +116,18 @@ for count in range(50):
 print(trainingaccuracy)
 print(testingaccuracy)
 
-plt.plot(iterations, trainingaccuracy, 'ro', label="Training Accuracy")
-plt.plot(iterations, testingaccuracy, 'b^', label="Testing Accuracy")
-plt.axis([0, 50, 0, 1])
+plt.figure(1)
+plt.title("Training Data")
+plt.plot(iterations, trainingaccuracy, 'ro')
+# plt.axis([0, 100, 0, 1])
 plt.xlabel("Number of Gradient Iterations")
 plt.ylabel("Accuracy Percentage")
-plt.legend(loc='lower right')
+plt.show()
+
+plt.figure(2)
+plt.title("Testing Data")
+plt.plot(iterations, testingaccuracy, 'b^')
+# plt.axis([0, 100, 0, 1])
+plt.xlabel("Number of Gradient Iterations")
+plt.ylabel("Accuracy Percentage")
 plt.show()

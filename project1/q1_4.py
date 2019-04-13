@@ -2,15 +2,24 @@ import sys
 import numpy as np
 from numpy.linalg import inv
 import matplotlib.pyplot as plt
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('trainingdatafile')
+parser.add_argument('testingdatafile')
+args = parser.parse_args()
+
+#open the files for inputs
+
 
 dval = [2, 4, 6, 8, 10]
 trainingASE = []
 testingASE = []
 for d in range(2, 11, 2):
     #open the files for inputs
-    trainingfile = open("housing_train.txt", "r")
+    trainingfile = open(args.trainingdatafile, "r")
 
-    testingfile = open("housing_test.txt", "r")
+    testingfile = open(args.testingdatafile, "r")
 
 
     #initialize variables as empty lists
@@ -64,7 +73,7 @@ for d in range(2, 11, 2):
     #this creates a list that will hold the predicted values of the training data
     trainingdatapredictY = []
     #this reopens the training data to be able to calculate the ASE
-    predicttrainingfile = open("housing_train.txt", "r")
+    predicttrainingfile = open(args.trainingdatafile, "r")
 
     #this calculates the predicted values using the weight vector for the training data set
     #it does this by taking each feature and multiplying it by the corresponding weight

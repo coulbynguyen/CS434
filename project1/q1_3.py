@@ -1,10 +1,17 @@
 import sys
 import numpy as np
 from numpy.linalg import inv
-#open the files for inputs
-trainingfile = open("housing_train.txt", "r")
+import argparse
 
-testingfile = open("housing_test.txt", "r")
+parser = argparse.ArgumentParser()
+parser.add_argument('trainingdatafile')
+parser.add_argument('testingdatafile')
+args = parser.parse_args()
+
+#open the files for inputs
+trainingfile = open(args.trainingdatafile, "r")
+
+testingfile = open(args.testingdatafile, "r")
 
 
 #initialize variables as empty lists
@@ -45,7 +52,7 @@ print(w)
 #this creates a list that will hold the predicted values of the training data
 trainingdatapredictY = []
 #this reopens the training data to be able to calculate the ASE
-predicttrainingfile = open("housing_train.txt", "r")
+predicttrainingfile = open(args.trainingdatafile, "r")
 
 #this calculates the predicted values using the weight vector for the training data set
 #it does this by taking each feature and multiplying it by the corresponding weight
