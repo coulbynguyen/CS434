@@ -4,6 +4,9 @@ import math
 import operator
 import numpy as np
 import argparse
+import matplotlib.pyplot as plt
+from scipy.stats import entropy
+from math import log, e
 parser = argparse.ArgumentParser()
 parser.add_argument('trainingdatafile')
 parser.add_argument('testingdatafile')
@@ -49,6 +52,30 @@ def gini_index(groups, classes):
         gini += (1.0 - score) * (size/n_instances)
     return gini
 
+def entropy2(labels, base=None):
+    """ Computes entropy of label distribution. """
+
+    n_labels = len(labels)
+
+    if n_labels <= 1:
+        return 0
+
+    value,counts = np.unique(labels, return_counts=True)
+    probs = counts / n_labels
+    n_classes = np.count_nonzero(probs)
+
+    if n_classes <= 1:
+        return 0
+
+    ent = 0.
+
+    # Compute entropy
+    base = e if base is None else base
+    for i in probs:
+        ent -= i * log(i, 2)
+
+    return ent
+
 def get_split(dataset):
     class_values = list(set(row[0] for row in dataset))
     b_index, b_value, b_score, b_groups = 999, 999, 999, None
@@ -57,10 +84,12 @@ def get_split(dataset):
         index = index+1
         for row in dataset:
             groups = test_split(index, row[index], dataset)
-            gini = gini_index(groups, class_values)
+            group_labels_left = [i[0] for i in groups[0]]
+            group_labels_right = [i[0] for i in groups[1]]
+            entropy = (entropy2(group_labels_left) + entropy2(group_labels_right))
             # print('X%d < %.3f Gini=%f' %((index), row[index], gini))
-            if gini < b_score:
-                b_index, b_value, b_score, b_groups = index, row[index], gini, groups
+            if entropy < b_score:
+                b_index, b_value, b_score, b_groups = index, row[index], entropy, groups
     return {'index':b_index, 'value':b_value, 'groups':b_groups}
 
 # Create a terminal node value
@@ -130,3 +159,37 @@ for row in testingdata:
     if prediction == row[0]:
         correct += 1
 print("Testing Error: " + str(1 - float(correct)/len(testingdata)))
+
+
+# d = [1,2,3,4,5,6]
+# training_error = []
+# testing_error = []
+#
+# for i in d:
+# tree = build_tree(trainingdata, d, 1)
+#
+# correct = 0
+#
+# for row in trainingdata:
+#     prediction = predict(tree, row)
+#     if prediction == row[0]:
+#         correct += 1
+# training_error.append(1-float(correct)/len(trainingdata))
+#
+# correct = 0
+#
+# for row in testingdata:
+#     prediction = predict(tree, row)
+#     if prediction == row[0]:
+#         correct += 1
+# testing_error.append(1-float(correct)/len(testingdata))
+
+
+# plt.figure(1)
+# plt.title("Decision Tree Error")
+# plt.plot(d, training_error, 'ro', label='Training Error')
+# plt.plot(d, testing_error, 'b^', label='Testing Error')
+# plt.xlabel("Tree Depth")
+# plt.ylabel("Error")
+# plt.legend(loc='upper right')
+# plt.show()
