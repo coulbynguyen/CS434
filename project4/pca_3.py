@@ -35,25 +35,21 @@ ten_eigen_vector = np.asarray([eigen_pairs[i][1] for i in range(10)])
 
 np_mean_vector = np.asarray(mean_vector)
 
-plt.figure(1)
-plt.title("Representation of the Mean Image")
-plt.imshow(np_mean_vector.reshape((28,28)))
+reduced_repr = np.dot(ten_eigen_vector, npdata.transpose())
+image_idxs = np.argmin(reduced_repr, axis=1)
+
+fig = plt.figure(figsize=(25,5))
+for x in range(10):
+    plt.subplot(2, 10, x+1)
+    plt.imshow(np.reshape(data[image_idxs[x]], (28,28)))
+    plt.subplot(2, 10, x+11)
+    plt.imshow(np.reshape(ten_eigen_vector[x].real, (28,28)))
+plt.tight_layout()
 try:
     plt.show()
 except:
-    print("cannot show image")
-plt.savefig("np_mean_vector.png")
-#print("Below is the calculated mean vector")
-#print(np_mean_vector)
-i = 1
-for vec in ten_eigen_vector:
-    plt.figure(i+1)
-    plt.title("Eigen Vector #"+str(i))
-    plt.imshow(vec.reshape((28,28)))
-    try:
-        plt.show()
-    except:
-        print("cannot show image")
-    plt.savefig("eigenvec"+str(i))
-    i += 1
+    print("cannot show graph")
+plt.savefig("PCA_img_vec.png")
+
+
 
